@@ -32,9 +32,9 @@
     "index.html"
   ],
   "dependencies": {
-    "firebase": "2.0.x",
     "backbone": "<=1.1.0",
-    "underscore": "~1.5.2"
+    "underscore": "~1.5.2",
+    "firebase": "^3.0.0"
   },
   "devDependencies": {
     "mockfirebase": "~0.3.0"

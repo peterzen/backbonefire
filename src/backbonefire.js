@@ -551,7 +551,7 @@
             this._suppressEvent = true;
           }
 
-          var childRef = this.firebase.child(model.id);
+          var childRef = this.firebase.ref.child(model.id);
           childRef.set(model, _.bind(options.success, model));
         }
 
@@ -578,7 +578,7 @@
 
         for (var i = 0; i < parsed.length; i++) {
           var model = parsed[i];
-          var childRef = this.firebase.child(model.id);
+          var childRef = this.firebase.ref.child(model.id);
           if (options.silent === true) {
             this._suppressEvent = true;
           }
@@ -744,7 +744,7 @@
         // consolidate the updates to Firebase
         updateAttributes = this._compareAttributes(remoteAttributes, localAttributes);
 
-        ref = this.firebase.child(model.id);
+        ref = this.firebase.ref.child(model.id);
 
         // if '.priority' is present setWithPriority
         // else do a regular update
@@ -793,7 +793,7 @@
         options = options ? _.clone(options) : {};
         options.success =
           _.isFunction(options.success) ? options.success : function() {};
-        var childRef = this.firebase.child(model.id);
+        var childRef = this.firebase.ref.child(model.id);
         Backbone.Firebase._setWithCheck(childRef, null, _.bind(options.success, model));
       },
 

@@ -318,11 +318,6 @@
       Backbone.Model.apply(this, arguments);
       var defaults = _.result(this, 'defaults');
 
-      var urlRoot = _.result(this, 'urlRoot');
-      if(typeof urlRoot != 'object'){
-        throw 'invalid urlRoot: '+ urlRoot;
-      }
-
       // Apply defaults only after first sync.
       this.once('sync', function() {
         this.set(_.defaults(this.toJSON(), defaults));

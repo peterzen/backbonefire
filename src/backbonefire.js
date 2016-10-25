@@ -21,7 +21,7 @@
    * helper can be removed.
    */
   Backbone.Firebase._getKey = function(refOrSnapshot) {
-    return (typeof refOrSnapshot.key === 'function') ? refOrSnapshot.key() : refOrSnapshot.name();
+    return (typeof refOrSnapshot.key === 'function') ? refOrSnapshot.key() : refOrSnapshot.key;
   };
 
   /**
@@ -318,6 +318,11 @@
       Backbone.Model.apply(this, arguments);
       var defaults = _.result(this, 'defaults');
 
+      var urlRoot = _.result(this, 'urlRoot');
+      if(typeof urlRoot != 'object'){
+        throw 'invalid urlRoot: '+ urlRoot;
+      }
+
       // Apply defaults only after first sync.
       this.once('sync', function() {
         this.set(_.defaults(this.toJSON(), defaults));
@@ -347,6 +352,16 @@
         SyncModel.apply(this, arguments);
       }
 
+    },
+
+    url: function() {
+      var base =
+          _.result(this, 'urlRoot') ||
+          _.result(this.collection, 'url') ||
+          urlError();
+      if (this.isNew()) return base;
+      var id = this.get(this.idAttribute);
+      return base.child(id);
     },
     
     sync: function(method, model, options) {
@@ -835,7 +850,7 @@
 
         var newItem = new BaseModel(attrs, opts);
         newItem.autoSync = false;
-        newItem.firebase = self.firebase.child(newItem.id);
+        newItem.firebase = self.firebase.ref.child(newItem.id);
         newItem.sync = Backbone.Firebase.sync;
         newItem.on('change', function(model) {
           var updated = Backbone.Firebase.Model.prototype._updateModel(model);

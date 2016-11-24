@@ -48,32 +48,32 @@
   Backbone.Firebase.sync = function(method, model, options) {
     var modelJSON = model.toJSON();
 
-    if (method === 'read') {
+	    if (method === 'read') {
 
-      Backbone.Firebase._readOnce(model.firebase, function onComplete(snap) {
-        var resp = snap.val();
-        if(options.success) {
-          options.success(resp);
-        }
-      }, function _readOnceError(err) {
-        if(options.error) {
-          options.error(err);
-        }
-      });
+		    Backbone.Firebase._readOnce(model.firebase, function onComplete(snap) {
+			    var resp = snap.val();
+			    if (options.success) {
+				    options.success(resp);
+			    }
+		    }, function _readOnceError(err) {
+			    if (options.error) {
+				    options.error(err);
+			    }
+		    });
 
-    } else if (method === 'create') {
+	    } else if (method === 'create') {
 
-      Backbone.Firebase._setWithCheck(model.firebase, modelJSON, options);
+		    Backbone.Firebase._setWithCheck(model.firebase, modelJSON, options);
 
-    } else if (method === 'update') {
+	    } else if (method === 'update') {
 
-      Backbone.Firebase._updateWithCheck(model.firebase, modelJSON, options);
+		    Backbone.Firebase._updateWithCheck(model.firebase, modelJSON, options);
 
-    } else if(method === 'delete') {
+	    } else if (method === 'delete') {
 
-      Backbone.Firebase._setWithCheck(model.firebase, null, options);
+		    Backbone.Firebase._setWithCheck(model.firebase, null, options);
 
-    }
+	    }
 
   };
 
@@ -265,26 +265,32 @@
 
       // apply local changes remotely
       this._listenLocalChange(function(model) {
-        this.firebase.update(model);
+      	var _fb = this.firebase;
+        this.firebase.update(model)
+          .catch(function (error) {
+            console.error('Firebase update exception: ', error, model);
+            console.info('URL: ' + _fb.toString() + '\n');
+            console.info('JSON update\n' + JSON.stringify(model) + '\n\n\n');
+          });
       });
 
     }
 
     SyncModel.protoype = {
       fetch: function(options) {
-        Backbone.Firebase._promiseEvent({
-          syncPromise: this._initialSync,
-          context: this,
-          success: function() {
-            this.trigger('sync', this, null, options);
-          },
-          error: function(err) {
-            this.trigger('err', this, err, options);
-          },
-          complete: function() {
-            Backbone.Firebase._onCompleteCheck(this._initialSync.err, this, options);
-          }
-        });
+	        Backbone.Firebase._promiseEvent({
+		        syncPromise: this._initialSync,
+		        context: this,
+		        success: function () {
+			        this.trigger('sync', this, null, options);
+		        },
+		        error: function (err) {
+			        this.trigger('err', this, err, options);
+		        },
+		        complete: function () {
+			        Backbone.Firebase._onCompleteCheck(this._initialSync.err, this, options);
+		        }
+	        });
       }
     };
 
@@ -358,7 +364,7 @@
       var id = this.get(this.idAttribute);
       return base.child(id);
     },
-    
+
     sync: function(method, model, options) {
       Backbone.Firebase.sync(method, model, options);
     },
@@ -406,6 +412,7 @@
      * so Firebase properly deletes them.
      */
     _updateModel: function(model) {
+
       var modelObj = model.changedAttributes();
       _.each(model.changed, function(value, key) {
         if (typeof value === 'undefined' || value === null) {
@@ -430,7 +437,7 @@
       this[method]('change', function(model) {
         var newModel = this._updateModel(model);
         if(_.isFunction(cb)){
-          cb.call(this, newModel);
+	          cb.call(this, newModel);
         }
       }, this);
     }
